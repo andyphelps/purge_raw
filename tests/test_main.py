@@ -17,12 +17,10 @@ class TestMain:
         tempdir = None
         try:
             tempdir = tempfile.mkdtemp("_purgeraw")
-            print(f"test dir created: {tempdir}")
             yield tempdir
         finally:
             if tempdir is not None:
                 os.rmdir(tempdir)
-                print(f"test dir removed: {tempdir}")
 
     @pytest.fixture
     def runner(self):
@@ -43,10 +41,35 @@ class TestMain:
     @patch("purgeraw.purge_orchestrator.PurgeOrchestrator.purge")
     def test_when_input_dir_present_then_purge_called(self, purge, runner):
         with self.make_test_dir() as dirname:
-
             result = runner.invoke(purgeraw.main.main, ["-i", dirname])
 
             assert result.exit_code == 0
             assert purge.called
             assert purge.call_args.args == (dirname, False)
 
+    @patch("purgeraw.purge_orchestrator.PurgeOrchestrator.purge")
+    def test_when_input_dir_present_with_dry_run_then_purge_called(self, purge, runner):
+        with self.make_test_dir() as dirname:
+            result = runner.invoke(purgeraw.main.main, ["-i", dirname, "-d"])
+
+            assert result.exit_code == 0
+            assert purge.called
+            assert purge.call_args.args == (dirname, True)
+
+    @patch("purgeraw.purge_orchestrator.PurgeOrchestrator.purge")
+    def test_when_input_dir_present_then_purge_called_long_params(self, purge, runner):
+        with self.make_test_dir() as dirname:
+            result = runner.invoke(purgeraw.main.main, ["--input", dirname])
+
+            assert result.exit_code == 0
+            assert purge.called
+            assert purge.call_args.args == (dirname, False)
+
+    @patch("purgeraw.purge_orchestrator.PurgeOrchestrator.purge")
+    def test_when_input_dir_present_with_dry_run_then_purge_called_long_params(self, purge, runner):
+        with self.make_test_dir() as dirname:
+            result = runner.invoke(purgeraw.main.main, ["--input", dirname, "--dryrun"])
+
+            assert result.exit_code == 0
+            assert purge.called
+            assert purge.call_args.args == (dirname, True)
