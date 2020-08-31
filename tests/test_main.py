@@ -1,20 +1,22 @@
 import os
 import tempfile
 
-import pytest
+import pytest  # type: ignore
 import purgeraw.main
-import purgeraw.purge_orchestrator
 
-from unittest.mock import patch
-from click.testing import CliRunner
+from unittest.mock import patch, Mock
+from click.testing import CliRunner, Result
 from contextlib import contextmanager
+from typing import Generator, Optional
+
+from purgeraw.file_service import delete, fake_delete
 
 
 class TestMain:
 
     @contextmanager
-    def make_test_dir(self):
-        tempdir = None
+    def make_test_dir(self) -> Generator[str, None, None]:
+        tempdir: Optional[str] = None
         try:
             tempdir = tempfile.mkdtemp("_purgeraw")
             yield tempdir
@@ -23,53 +25,107 @@ class TestMain:
                 os.rmdir(tempdir)
 
     @pytest.fixture
-    def runner(self):
-        yield CliRunner()
+    def runner(self) -> CliRunner:
+        return CliRunner()
 
-    def test_when_missing_input_dir_then_fails(self, runner):
-        result = runner.invoke(purgeraw.main.main, [])
+    def test_when_missing_input_dir_then_fails(self, runner: CliRunner) -> None:
+        result: Result = runner.invoke(purgeraw.main.main, [])
 
         assert result.exit_code == 2
         assert "Error: Missing option '-i' / '--input'." in result.output
 
-    def test_when_input_dir_not_exists_then_fails(self, runner):
-        result = runner.invoke(purgeraw.main.main, ["-i", "/flibble1212"])
+    def test_when_input_dir_not_exists_then_fails(self, runner: CliRunner) -> None:
+        result: Result = runner.invoke(purgeraw.main.main, ["-i", "/flibble1212"])
 
         assert result.exit_code == 2
         assert "Path '/flibble1212' does not exist." in result.output
 
-    @patch("purgeraw.purge_orchestrator.PurgeOrchestrator.purge")
-    def test_when_input_dir_present_then_purge_called(self, purge, runner):
+    @patch("purgeraw.main.raw_determinator")
+    @patch("purgeraw.main.directory_walker")
+    @patch("purgeraw.main.purger")
+    def test_when_input_dir_present_then_purge_called(self,
+                                                      purger_mock: Mock,
+                                                      walker_mock: Mock,
+                                                      raw_determinator_mock: Mock,
+                                                      runner: CliRunner) -> None:
+        walk_mock: Mock = Mock()
+        is_raw_mock: Mock = Mock()
+        walker_mock.return_value = walk_mock
+        raw_determinator_mock.return_value = is_raw_mock
+
+        dirname: str
         with self.make_test_dir() as dirname:
-            result = runner.invoke(purgeraw.main.main, ["-i", dirname])
+            result: Result = runner.invoke(purgeraw.main.main, ["-i", dirname])
 
             assert result.exit_code == 0
-            assert purge.called
-            assert purge.call_args.args == (dirname, False)
 
-    @patch("purgeraw.purge_orchestrator.PurgeOrchestrator.purge")
-    def test_when_input_dir_present_with_dry_run_then_purge_called(self, purge, runner):
+            assert walker_mock.call_args.args[0] == ["cr3", "jpg"]
+            assert raw_determinator_mock.call_args.args == (("cr3",), ("jpg",))
+            assert purger_mock.call_args.args == (walk_mock, delete, is_raw_mock)
+
+    @patch("purgeraw.main.raw_determinator")
+    @patch("purgeraw.main.directory_walker")
+    @patch("purgeraw.main.purger")
+    def test_when_input_dir_present_with_dry_run_then_purge_called(self,
+                                                                   purger_mock: Mock,
+                                                                   walker_mock: Mock,
+                                                                   raw_determinator_mock: Mock,
+                                                                   runner: CliRunner) -> None:
+        walk_mock: Mock = Mock()
+        is_raw_mock: Mock = Mock()
+        walker_mock.return_value = walk_mock
+        raw_determinator_mock.return_value = is_raw_mock
+
+        dirname: str
         with self.make_test_dir() as dirname:
-            result = runner.invoke(purgeraw.main.main, ["-i", dirname, "-d"])
+            result: Result = runner.invoke(purgeraw.main.main, ["-i", dirname, "-d"])
 
             assert result.exit_code == 0
-            assert purge.called
-            assert purge.call_args.args == (dirname, True)
 
-    @patch("purgeraw.purge_orchestrator.PurgeOrchestrator.purge")
-    def test_when_input_dir_present_then_purge_called_long_params(self, purge, runner):
+            assert purger_mock.call_args.args == (walk_mock, fake_delete, is_raw_mock)
+
+    @patch("purgeraw.main.raw_determinator")
+    @patch("purgeraw.main.directory_walker")
+    @patch("purgeraw.main.purger")
+    def test_when_input_dir_present_with_raw_extensions_then_purge_called(self,
+                                                                          purger_mock: Mock,
+                                                                          walker_mock: Mock,
+                                                                          raw_determinator_mock: Mock,
+                                                                          runner: CliRunner) -> None:
+        walk_mock: Mock = Mock()
+        is_raw_mock: Mock = Mock()
+        walker_mock.return_value = walk_mock
+        raw_determinator_mock.return_value = is_raw_mock
+
+        dirname: str
         with self.make_test_dir() as dirname:
-            result = runner.invoke(purgeraw.main.main, ["--input", dirname])
+            result: Result = runner.invoke(purgeraw.main.main, ["-i", dirname, "-r", "cr3", "-r", "raw"])
 
             assert result.exit_code == 0
-            assert purge.called
-            assert purge.call_args.args == (dirname, False)
 
-    @patch("purgeraw.purge_orchestrator.PurgeOrchestrator.purge")
-    def test_when_input_dir_present_with_dry_run_then_purge_called_long_params(self, purge, runner):
+            assert walker_mock.call_args.args[0] == ["cr3", "raw", "jpg"]
+            assert raw_determinator_mock.call_args.args == (("cr3", "raw"), ("jpg",))
+            assert purger_mock.call_args.args == (walk_mock, delete, is_raw_mock)
+
+    @patch("purgeraw.main.raw_determinator")
+    @patch("purgeraw.main.directory_walker")
+    @patch("purgeraw.main.purger")
+    def test_when_input_dir_present_with_processed_extensions_then_purge_called(self,
+                                                                                purger_mock: Mock,
+                                                                                walker_mock: Mock,
+                                                                                raw_determinator_mock: Mock,
+                                                                                runner: CliRunner) -> None:
+        walk_mock: Mock = Mock()
+        is_raw_mock: Mock = Mock()
+        walker_mock.return_value = walk_mock
+        raw_determinator_mock.return_value = is_raw_mock
+
+        dirname: str
         with self.make_test_dir() as dirname:
-            result = runner.invoke(purgeraw.main.main, ["--input", dirname, "--dryrun"])
+            result: Result = runner.invoke(purgeraw.main.main, ["-i", dirname, "-p", "png"])
 
             assert result.exit_code == 0
-            assert purge.called
-            assert purge.call_args.args == (dirname, True)
+
+            assert walker_mock.call_args.args[0] == ["cr3", "png"]
+            assert raw_determinator_mock.call_args.args == (("cr3",), ("png",))
+            assert purger_mock.call_args.args == (walk_mock, delete, is_raw_mock)
