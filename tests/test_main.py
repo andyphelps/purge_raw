@@ -10,6 +10,7 @@ from contextlib import contextmanager
 from typing import Generator, Optional
 
 from purgeraw.file_service import delete, fake_delete
+from purgeraw.indexer_service import indexer
 
 
 class TestMain:
@@ -63,7 +64,7 @@ class TestMain:
 
             assert walker_mock.call_args.args[0] == ["cr3", "jpg"]
             assert raw_determinator_mock.call_args.args[0] == ["cr3"]
-            assert purger_mock.call_args.args == (walk_mock, delete, is_raw_mock)
+            assert purger_mock.call_args.args == (walk_mock, delete, is_raw_mock, indexer)
             assert purge_mock.call_args.args[0] == dirname
 
     @patch("purgeraw.main.raw_determinator")
@@ -87,7 +88,7 @@ class TestMain:
 
             assert result.exit_code == 0
 
-            assert purger_mock.call_args.args == (walk_mock, fake_delete, is_raw_mock)
+            assert purger_mock.call_args.args == (walk_mock, fake_delete, is_raw_mock, indexer)
             assert purge_mock.call_args.args[0] == dirname
 
     @patch("purgeraw.main.raw_determinator")
@@ -113,7 +114,7 @@ class TestMain:
 
             assert walker_mock.call_args.args[0] == ["cr3", "raw", "jpg"]
             assert raw_determinator_mock.call_args.args[0] == ["cr3", "raw"]
-            assert purger_mock.call_args.args == (walk_mock, delete, is_raw_mock)
+            assert purger_mock.call_args.args == (walk_mock, delete, is_raw_mock, indexer)
             assert purge_mock.call_args.args[0] == dirname
 
     @patch("purgeraw.main.raw_determinator")
@@ -139,5 +140,5 @@ class TestMain:
 
             assert walker_mock.call_args.args[0] == ["cr3", "png"]
             assert raw_determinator_mock.call_args.args[0] == ["cr3"]
-            assert purger_mock.call_args.args == (walk_mock, delete, is_raw_mock)
+            assert purger_mock.call_args.args == (walk_mock, delete, is_raw_mock, indexer)
             assert purge_mock.call_args.args[0] == dirname

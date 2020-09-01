@@ -1,8 +1,9 @@
-import click
-
 from typing import Tuple
 
+import click
+
 from purgeraw.directory_service import directory_walker
+from purgeraw.indexer_service import indexer
 from purgeraw.purge_service import purger
 from purgeraw.file_service import fake_delete, delete, raw_determinator
 
@@ -16,7 +17,8 @@ from purgeraw.file_service import fake_delete, delete, raw_determinator
 def main(input_path: str, dry_run: bool, raw_exts: Tuple[str], processed_exts: Tuple[str]) -> None:
     purge = purger(directory_walker(list(raw_exts + processed_exts)),
                    fake_delete if dry_run else delete,
-                   raw_determinator(list(raw_exts)))
+                   raw_determinator(list(raw_exts)),
+                   indexer)
 
     purge(input_path)
 
