@@ -62,7 +62,7 @@ class TestMain:
             assert result.exit_code == 0
 
             assert walker_mock.call_args.args[0] == ["cr3", "jpg"]
-            assert raw_determinator_mock.call_args.args == (("cr3",), ("jpg",))
+            assert raw_determinator_mock.call_args.args[0] == ["cr3"]
             assert purger_mock.call_args.args == (walk_mock, delete, is_raw_mock)
             assert purge_mock.call_args.args[0] == dirname
 
@@ -112,7 +112,7 @@ class TestMain:
             assert result.exit_code == 0
 
             assert walker_mock.call_args.args[0] == ["cr3", "raw", "jpg"]
-            assert raw_determinator_mock.call_args.args == (("cr3", "raw"), ("jpg",))
+            assert raw_determinator_mock.call_args.args[0] == ["cr3", "raw"]
             assert purger_mock.call_args.args == (walk_mock, delete, is_raw_mock)
             assert purge_mock.call_args.args[0] == dirname
 
@@ -138,6 +138,6 @@ class TestMain:
             assert result.exit_code == 0
 
             assert walker_mock.call_args.args[0] == ["cr3", "png"]
-            assert raw_determinator_mock.call_args.args == (("cr3",), ("png",))
+            assert raw_determinator_mock.call_args.args[0] == ["cr3"]
             assert purger_mock.call_args.args == (walk_mock, delete, is_raw_mock)
             assert purge_mock.call_args.args[0] == dirname

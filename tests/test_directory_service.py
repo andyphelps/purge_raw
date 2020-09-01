@@ -3,7 +3,7 @@ from purgeraw.directory_service import directory_walker
 from typing import List
 
 
-class TestDirectoryRepository:
+class TestDirectoryService:
 
     @patch("os.walk")
     def test_when_empty_dir_then_empty_lists_returned(self, walk_mock: Mock) -> None:
