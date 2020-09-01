@@ -22,6 +22,8 @@ def purger(walker: Callable[[str], List[str]],
 
         to_remove: List[str] = [raw_files[raw_index] for raw_index in raw_files.keys() if
                                 raw_index not in processed_files.keys()]
+        to_remove.sort()
+
         print(f"Found {len(to_remove)} files to remove: {to_remove}")
 
         for file in to_remove:
