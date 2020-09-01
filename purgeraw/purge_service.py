@@ -14,17 +14,17 @@ def purger(walker: Callable[[str], List[str]],
         print(f"Found {len(files)} files to process")
 
         raw_files: Dict[str, str] = dict([indexes(file)[0] for file in files if is_raw(file)])
-        print(f"Found {len(raw_files)} raw files: {raw_files.values()}")
+        print(f"Found {len(raw_files)} raw files")
 
         processed_files: Dict[str, str] = dict(
             chain.from_iterable([indexes(file) for file in files if not is_raw(file)]))
-        print(f"Found {len(processed_files)} processed files: {processed_files}")
+        print(f"Found {len(processed_files)} processed files")
 
         to_remove: List[str] = [raw_files[raw_index] for raw_index in raw_files.keys() if
                                 raw_index not in processed_files.keys()]
         to_remove.sort()
 
-        print(f"Found {len(to_remove)} files to remove: {to_remove}")
+        print(f"Found {len(to_remove)} files to remove")
 
         for file in to_remove:
             deleter(file)

@@ -8,6 +8,7 @@ def fake_delete(path: str) -> None:
 
 def delete(path: str) -> None:
     os.remove(path)
+    print(f"Deleted {path}")
 
 
 def raw_determinator(raw_exts: List[str]) -> Callable[[str], bool]:
