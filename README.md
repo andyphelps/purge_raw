@@ -42,3 +42,5 @@ folder1/
     IMG_1000.jpg
     IMG_1002-1003.jpg
 </pre>
+
+To install run `pip install purgeraw`
