@@ -1,4 +1,9 @@
-Utility to remove unprocessed RAW files from a folder keeping only RAW files that yielded results
+**Overview**
+
+For photographers keeping every raw file captured can use a lot of space.  
+This utility allows a photographer to purge any unused raw files leaving 
+only the processed files with their associated raws
+
 
 For example, given the folder1 below:
 
@@ -11,7 +16,8 @@ folder1/
     IMG_1000.jpg
 </pre>
 
-running `python3 purgeraw.main -i /blah/folder1` would remove 1001 and 1002 raw files yielding:
+Running `praw -i /blah/folder1` would remove 1001 and 1002 raw 
+files as they don't have an associated cr3 file, yielding:
 
 <pre>
 folder1/
@@ -19,4 +25,3 @@ folder1/
   Processed/
     IMG_1000.jpg
 </pre>
-
