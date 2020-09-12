@@ -1,6 +1,7 @@
 import os
 from typing import List
-from toolz import curry   # type: ignore
+
+from toolz import curry  # type: ignore
 
 
 @curry

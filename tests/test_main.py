@@ -1,13 +1,13 @@
 import os
 import tempfile
-
-import pytest  # type: ignore
-import purgeraw.main
-
-from unittest.mock import patch, Mock, call
-from click.testing import CliRunner, Result
 from contextlib import contextmanager
 from typing import Generator, Optional
+from unittest.mock import patch, Mock, call
+
+import pytest  # type: ignore
+from click.testing import CliRunner, Result
+
+import purgeraw.main
 from purgeraw.index_extraction import indexer
 
 

@@ -1,6 +1,7 @@
-from unittest.mock import patch, Mock
-from purgeraw.directory_walker import directory_walker
 from typing import List
+from unittest.mock import patch, Mock
+
+from purgeraw.directory_walker import directory_walker
 
 
 class TestDirectoryWalker:

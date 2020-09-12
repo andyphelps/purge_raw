@@ -4,8 +4,8 @@ import click
 from toolz import pipe  # type: ignore
 
 from purgeraw import __version__
-from purgeraw.directory_walker import directory_walker
 from purgeraw.deletion import fake_deleter, deleter
+from purgeraw.directory_walker import directory_walker
 from purgeraw.index_extraction import indexer
 from purgeraw.purger import purge
 
