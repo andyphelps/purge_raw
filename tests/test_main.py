@@ -31,10 +31,10 @@ class TestMain:
         result: Result = runner.invoke(purgeraw.main.main, [])
 
         assert result.exit_code == 2
-        assert "Error: Missing option '-i' / '--input'." in result.output
+        assert "Error: Missing argument '<directory>'." in result.output
 
     def test_when_input_dir_not_exists_then_fails(self, runner: CliRunner) -> None:
-        result: Result = runner.invoke(purgeraw.main.main, ["-i", "/flibble1212"])
+        result: Result = runner.invoke(purgeraw.main.main, ["/flibble1212"])
 
         assert result.exit_code == 2
         assert "Path '/flibble1212' does not exist." in result.output
@@ -53,7 +53,7 @@ class TestMain:
 
         dirname: str
         with self.make_test_dir() as dirname:
-            result: Result = runner.invoke(purgeraw.main.main, ["-i", dirname])
+            result: Result = runner.invoke(purgeraw.main.main, [dirname])
 
         assert result.exit_code == 0
         assert walker_mock.call_args_list == [call(["cr3", "xmp", "jpg"]),
@@ -77,7 +77,7 @@ class TestMain:
 
         dirname: str
         with self.make_test_dir() as dirname:
-            result: Result = runner.invoke(purgeraw.main.main, ["-i", dirname, "-d"])
+            result: Result = runner.invoke(purgeraw.main.main, [dirname, "-d"])
 
         assert result.exit_code == 0
         assert walker_mock.call_args_list == [call(["cr3", "xmp", "jpg"]),
@@ -99,7 +99,7 @@ class TestMain:
 
         dirname: str
         with self.make_test_dir() as dirname:
-            result: Result = runner.invoke(purgeraw.main.main, ["-i", dirname, "-r", "cr2", "-r", "raw"])
+            result: Result = runner.invoke(purgeraw.main.main, [dirname, "-r", "cr2", "-r", "raw"])
 
         assert result.exit_code == 0
         assert walker_mock.call_args_list[0] == call(["cr2", "raw", "jpg"])
@@ -116,7 +116,7 @@ class TestMain:
 
         dirname: str
         with self.make_test_dir() as dirname:
-            result: Result = runner.invoke(purgeraw.main.main, ["-i", dirname, "-p", "png"])
+            result: Result = runner.invoke(purgeraw.main.main, [dirname, "-p", "png"])
 
         assert result.exit_code == 0
         assert walker_mock.call_args_list[0] == call(["cr3", "xmp", "png"])

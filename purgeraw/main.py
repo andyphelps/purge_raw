@@ -11,8 +11,7 @@ from purgeraw.purger import purge
 
 
 @click.command("praw")
-@click.option("-i", "--input", "input_path", required=True, type=click.Path(exists=True), metavar="<directory>",
-              help="Directory of processed and raw images to be purged.")
+@click.argument("input_path", nargs=1, required=True, type=click.Path(exists=True), metavar="<directory>")
 @click.option("-d", "--delete", "do_delete", is_flag=True,
               help="By default praw will just explain what would be removed. A"
                    "dd this flag to perform the deletion.")
@@ -24,7 +23,7 @@ from purgeraw.purger import purge
                    "Can also be specified multiple times as -r above.")
 @click.version_option(__version__, prog_name="praw")
 def main(input_path: str, do_delete: bool, raw_exts: Tuple[str], processed_exts: Tuple[str]) -> None:
-    """Trawls the input directory for raw and processed images.
+    """Trawls the given directory for raw and processed images.
     Where it finds a raw image with a numeric index that can't be
     found in the processed images it is marked for removal.
 

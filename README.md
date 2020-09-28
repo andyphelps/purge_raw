@@ -29,7 +29,7 @@ folder1/
     IMG_1002-1003.jpg
 </pre>
 
-Running `praw -i folder1 -d` would remove the IMG_1001.cr3 and 
+Running `praw folder1 -d` would remove the IMG_1001.cr3 and 
 IMG_1004.cr3 raw images as they don't have associated processed images.
 
 The resulting directory would be left as:
