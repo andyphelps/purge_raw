@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "PurgeRaw"
-version = "1.0.4"
+version = "1.0.5"
 description = "Utility to remove unprocessed RAW files from a folder keeping only RAW files that yielded results"
 readme = "README.md"
 authors = ["Andy Phelps <andrew.m.phelps@gmail.com>"]
